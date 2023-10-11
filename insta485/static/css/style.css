@@ -1,0 +1,100 @@
+p {
+    color: black;
+    font-size: 20px;
+    text-align: center;
+}
+div{
+    font-size:20px;
+    text-align:center;
+}
+div.pfp {
+    font-size:24px;
+    margin-top: auto;
+    margin-bottom: auto;    
+    vertical-align: middle;
+}
+div.post {
+    background-color: #fffde7;
+    color:black;
+    font-size: 20px;
+    text-align: center;
+    max-width: 75%;
+    margin-left: auto;
+    margin-right:auto;  
+    padding-bottom: 20pt;
+    padding-top:20pt;
+    margin-top:20pt;
+    margin-bottom:20pt;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+div.img{
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", 
+  Helvetica, Arial, "Lucida Grande", sans-serif;
+    background-color: #FAF9F6;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-left:auto;
+    margin-right:auto;
+    max-width: 50%;
+}
+div.comment{
+    width: 80%;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-left:auto;
+    margin-right:auto;
+    max-width: 50%;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+img.pfp {
+    border: 2px solid   #fffde7;
+    border-radius: 50%;
+    width:50px;
+    height:50px;
+    overflow:hidden;
+    vertical-align: middle;
+    
+}
+img.post {
+    width: 500px;
+    height:500px;
+    overflow:hidden;
+}
+img.logo {
+    width:200px;
+    height:200px;
+    overflow:hidden;
+}
+img.thumbnail {
+    border: 6px solid whitesmoke; /* Gray border */
+    border-radius: 4px;  /* Rounded border */
+    /*padding: 5px; /* Some padding */
+    width: 200px; /* Set a small width */
+    height:200px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+form.button {
+    display: inline; 
+}
+
+div.upload {
+    padding: 2px 8px 21px;
+    display: inline-block;
+    border: 3px solid #654321;
+    font-size: 2.5rem;
+    border-radius: 2% 6% 5% 4% / 1% 1% 2% 4%;
+    text-transform: uppercase;
+    letter-spacing: 0.3ch;
+    background: azure;
+    position: relative;
+}
+img.edit-pfp {
+    border: 2px solid   #fffde7;
+    border-radius: 50%;
+    width:200px;
+    height:200px;
+    overflow:hidden;
+    vertical-align: middle;
+    
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>insta485</title>
+        <link rel="stylesheet" href="/../static/css/style.css">
+	</head>
+	<body style="background-color: azure;">
+		<div style = "margin-left: auto; margin-right: auto;">
+            <img style="margin-left:auto; margin-right: auto;" src="{{url_for('static',filename='images/logo.jpg')}}" alt = "Logo" class="logo">
+        </div>
+        <div>
+            <a href = "{{url_for('show_login')}}">login</a>
+        </div>
+        <div class = "post">
+            <form action="{{url_for('account_ops')}}?target={{url_for('show_create')}}" method="post" enctype="multipart/form-data">
+                <p>Photo</p><input type="file" name="file" required style="display:flex; justify-content: center; margin-left: auto; margin-right:35%"/>
+                <p>Name</p><input type="text" name="fullname" placeholder="fullname"  required/>
+                <p>Username</p><input type="text" name="username" placeholder="username" required/>
+                <p>Email</p><input type="text" name="email" placeholder="email" required/>
+                <p>Password</p><input type="password" name="password" placeholder="password" required/>
+                <p></p><input type="submit" name="signup" value="sign up" style = "font-size: 20px; background-color: azure;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"/>
+                <input type="hidden" name="operation" value="create"/>
+            </form>
+        </div>
+        <p>Have an account?<a href="{{url_for('show_login')}}">Log in</a></p>
+	</body>
+</html>

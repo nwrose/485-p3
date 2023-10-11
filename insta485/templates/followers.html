@@ -1,0 +1,33 @@
+{% extends "all.html" %}
+{% block content %}	
+<div class = "post">
+<h1>Followers</h1>
+{% for account in followers %}
+<p>
+    <div class="pfp">
+        <img class ="pfp" src="{{url_for('serve_image',filename='{}'.format(account.filename))}}" alt='pfp'> <a href="{{url_for('show_user',user=account.username)}}">{{account.username}}</a>
+    
+    {% if account.username == logname %}
+        <span> </span>
+    </div>
+    {% elif account.is_following == 1 %}
+        <span>following</span>
+    </div>
+    <form class = "button" action="{{url_for('follow_ops')}}?target={{url_for('show_followers', user='{}'.format(usr))}}" method="post" enctype="multipart/form-data">
+        <input type="submit" name="unfollow" value="unfollow"/>
+        <input type="hidden" name="username" value="{{account.username}}"/>
+        <input type="hidden" name="operation" value="unfollow"/>
+    </form>
+    {% else %}
+        <span> not following</span>
+    </div>
+    <form class = "button" action="{{url_for('follow_ops')}}?target={{url_for('show_followers', user='{}'.format(usr))}}" method="post" enctype="multipart/form-data">
+        <input type="submit" name="follow" value="follow"/>
+        <input type="hidden" name="username" value="{{account.username}}"/>
+        <input type="hidden" name="operation" value="follow"/>
+    </form>
+    {% endif %}
+</p>
+{% endfor %}
+</div>
+{% endblock content %}

@@ -1,0 +1,61 @@
+{% extends "all.html" %}
+{% block content %}	
+
+<div class="post">
+    <div class="img"> 
+        <div class="pfp">  
+            <a href="{{url_for('show_user',user=post.owner)}}">
+            <img src="{{url_for('serve_image',filename='{}'.format(post.pfp))}}" alt='img' class="pfp"> 
+            {{post.owner}}
+            </a>
+        </div>
+        <p>{{post.created}}</p>
+        <img src="{{url_for('serve_image',filename='{}'.format(post.filename))}}" alt="img" class="post"></div>
+    {% if post.likes == 1 %}
+        <p>1 like</p>
+    {% else %}
+        <p>{{post.likes}} likes</p>
+    {% endif %}
+    {% for comment in post.comments %}
+    <div class="comment">
+        <label><a href = "{{url_for('show_user',user=comment.owner)}}">{{comment.owner}}</a> {{comment.text}}</label>
+            {% if comment.owner == logname %}
+                <form class="button" action="{{url_for('comment_ops')}}?target={{url_for('show_post', postid='{}'.format(post.postid))}}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="operation" value="delete"/>
+                    <input type="hidden" name="commentid" value="{{comment.commentid}}"/>
+                    <input type="submit" name="uncomment" value="delete"/>
+                </form>
+            {% endif %}
+    </div>
+    {% endfor %}
+    {% if post.is_liked == 1 %}
+        <form class="button" action="{{url_for('like_ops')}}?target={{url_for('show_post', postid='{}'.format(post.postid))}}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="operation" value="unlike"/>
+            <input type="hidden" name="postid" value="{{post.postid}}"/>
+            <input type="submit" name="unlike" value="unlike"/>
+        </form>
+    {% else %}
+        <form class="button" action="{{url_for('like_ops')}}?target={{url_for('show_post', postid='{}'.format(post.postid))}}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="operation" value="like"/>
+            <input type="hidden" name="postid" value="{{post.postid}}"/>
+            <input type="submit" name="like" value="like"/>
+        </form>
+    {% endif %}
+    <form class="button" action="{{url_for('comment_ops')}}?target={{url_for('show_post', postid='{}'.format(post.postid))}}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="operation" value="create"/>
+        <input type="hidden" name="postid" value="{{post.postid}}"/>
+        <input type="text" name="text" required/>
+        <input type="submit" name="comment" value="comment"/>
+    </form>
+    {% if logname == post.owner %}
+    <p>
+        <form action="{{url_for('post_ops')}}?target={{url_for('show_user', user='{}'.format(logname))}}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="operation" value="delete"/>
+            <input type="hidden" name="postid" value="{{post.postid}}"/>
+            <input type="submit" name="delete" value="delete this post"/>
+        </form>
+    </p>
+    {% endif %}
+</div>
+
+{% endblock content %}

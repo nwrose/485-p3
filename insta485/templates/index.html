@@ -1,0 +1,46 @@
+{% extends "all.html" %}
+{% block content %}	
+
+
+	{% for post in posts %}
+	<div class="post">
+		<div class="img">
+			<a href="{{url_for('show_user',user=post.owner)}}"><img src="{{url_for('serve_image',filename='{}'.format(post.pfp))}}" alt = "img" class="pfp"> {{post.owner}}</a>
+			<a href="{{url_for('show_post',postid=post.postid)}}"> {{post.created}}</a>
+			<img src="{{url_for('serve_image',filename='{}'.format(post.filename))}}" alt="post_img" class = "post">
+		</div>
+		<div class="comment">
+			{% if post.likes == 1 %}
+				<span>1 like</span>
+			{% else %}	
+				<span>{{post.likes}} likes</span>
+			{% endif %}
+			{% for comment in post.comments %}
+				<p><a href = "{{url_for('show_user',user=comment.owner)}}">{{comment.owner}}</a> {{comment.text}}</p>
+			{% endfor %}
+			{% if post.is_liked == 1 %}
+				<form class="button" action="{{url_for('like_ops')}}?target={{url_for('show_index')}}" method="post" enctype="multipart/form-data">
+					<input type="hidden" name="operation" value="unlike"/>
+					<input type="hidden" name="postid" value="{{post.postid}}"/>
+					<input type="submit" name="unlike" value="unlike"/>
+				</form>
+			{% else %}
+				<form class="button" action="{{url_for('like_ops')}}?target={{url_for('show_index')}}" method="post" enctype="multipart/form-data">
+					<input type="hidden" name="operation" value="like"/>
+					<input type="hidden" name="postid" value="{{post.postid}}"/>
+					<input type="submit" name="like" value="like"/>
+				</form>
+			{% endif %}
+			<form class="button" action="{{url_for('comment_ops')}}?target={{url_for('show_index')}}" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="operation" value="create"/>
+				<input type="hidden" name="postid" value="{{post.postid}}"/>
+				<input type="text" name="text" required/>
+				<input type="submit" name="comment" value="comment"/>
+			</form>	
+		</div>
+    </div>
+
+
+	{% endfor %}
+{% endblock content %}
+

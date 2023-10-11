@@ -1,0 +1,24 @@
+{% extends "all.html" %}
+{% block content %}	
+<div class = "post">
+    <div class = "pfp">
+        <img class = "edit-pfp" src="{{url_for('serve_image',filename='{}'.format(usr.filename))}}" alt="pfp">
+    </div>
+    <h2>{{logname}}</h2>
+    <div class = "upload">
+        <form action="{{url_for('account_ops')}}?target={{url_for('show_acc_edit')}}" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*"/>
+            <input type="text" name="fullname" value="{{usr.fullname}}" required/>
+            <input type="text" name="email" value="{{usr.email}}" required/>
+            <input type="submit" name="update" value="submit"/>
+            <input type="hidden" name="operation" value="edit_account"/>
+        </form>
+    </div>
+    <div>
+        <a href="{{url_for('show_password')}}">Change password</a>
+    </div>
+    <div>
+        <a href="{{url_for('show_delete')}}">Delete account</a>
+    </div>
+</div>
+{% endblock content %}

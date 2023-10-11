@@ -1,0 +1,64 @@
+{% extends "all.html" %}
+{% block content %}	
+<div class="post">
+    <h1>{{page_owner.username}}</h1>
+    {% if page_owner.username == logname %}
+        <p><a href="{{url_for('show_acc_edit')}}">Edit profile</a></p>
+        <div>
+            <form action="{{url_for('logout')}}" method="post" enctype="multipart/form-data">
+                <input type="submit" name="logout" value="Logout"/>
+            </form>
+        </div>
+  
+    {% elif page_owner.is_following == 0 %}
+        <p>not following</p>
+        <form action="{{url_for('follow_ops')}}?target={{url_for('show_user', user='{}'.format(page_owner.username))}}" method="post" enctype="multipart/form-data">
+            <input type="submit" name="follow" value="follow"/>
+            <input type="hidden" name="username" value="{{page_owner.username}}"/>
+            <input type="hidden" name="operation" value="follow"/>
+        </form>
+    {% else %}
+        <p>following</p>
+        <form action="{{url_for('follow_ops')}}?target={{url_for('show_user', user='{}'.format(page_owner.username))}}" method="post" enctype="multipart/form-data">
+            <input type="submit" name="unfollow" value="unfollow"/>
+            <input type="hidden" name="username" value="{{page_owner.username}}"/>
+            <input type="hidden" name="operation" value="unfollow"/>
+        </form>
+    {% endif %}
+
+    {% if page_owner.num_posts == 1 %}
+        <p> 1 post</p>
+    {% else %}
+        <p>{{page_owner.num_posts}} posts</p>
+    {% endif %}
+    {% if page_owner.num_followers == 1 %}
+        <a href="{{url_for('show_followers',user=page_owner.username)}}"> 1 follower</a>
+    {% else %}
+        <a href="{{url_for('show_followers',user=page_owner.username)}}">{{page_owner.num_followers}} followers</a>
+    {% endif %}
+    <a href = "{{url_for('show_following',user=page_owner.username)}}">{{page_owner.num_following}} following</a>
+
+    {% if page_owner.username == logname %}
+    <p>
+        <div class="upload">
+            <form action="{{url_for('post_ops')}}?target={{url_for('show_user', user='{}'.format(page_owner.username))}}" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required/>
+                <input type="submit" name="create_post" value="upload new post"/>
+                <input type="hidden" name="operation" value="create"/>
+            </form>
+        </div>
+    </p>
+    {% endif %}
+
+
+    <p>{{page_owner.fullname}}</p>
+    {% if page_owner.num_posts == 0 %}
+        <p>No posts yet.</p>
+    {% else %}
+        {% for post in page_owner.posts %}
+            <a href = "{{url_for('show_post',postid=post.postid)}}"><img class="thumbnail" src="{{url_for('serve_image',filename='{}'.format(post.filename))}}" alt='post'></a>
+        {% endfor %}
+    {% endif %} 
+</div>
+
+{% endblock content %}
