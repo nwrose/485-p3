@@ -125,10 +125,31 @@ def get_post(postid, logname):
         likes['url'] = f"/api/v1/likes/{mylike['likeid']}/"
     post['likes'] = likes
     return post
-    
 
 
-
+def get_like(logname, postid):
+    connection = get_db()
+    cur = connection.execute(
+        "SELECT likeid FROM likes "
+        "WHERE likes.owner = '" + logname + "' "
+        "AND likes.postid = " + str(postid) + ""
+    )
+    likeid = cur.fetchall()
+    if len(likeid) == 0:
+        cur = connection.execute(
+            "INSERT INTO likes(owner, postid) "
+            "VALUES ('" + logname + "', " + str(postid) + ")"
+        )
+        cur = connection.execute(
+        "SELECT likeid FROM likes "
+        "WHERE likes.owner = '" + logname + "' "
+        "AND likes.postid = " + str(postid) + ""
+        )
+        likeid = cur.fetchall()
+        likeid = likeid[0]['likeid']
+        return (likeid, 201)
+    likeid = likeid[0]['likeid']
+    return (likeid, 200)
 
 
 

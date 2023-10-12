@@ -17,7 +17,7 @@ def show_api():
 
 
 @insta485.app.route('/api/v1/posts/', methods = ["GET"])
-def show_posts_api():
+def show_post_feed_api():
     """Returns requested postURLs and postids as specified by querystring.
     """
     logname = ""
@@ -45,7 +45,7 @@ def show_posts_api():
     return flask.jsonify(json_file), 200
 
 
-@insta485.app.route('/api/v1/posts/<int:postid_url_slug>/')
+@insta485.app.route('/api/v1/posts/<int:postid_url_slug>/', methods = ["GET"])
 def show_post_api(postid_url_slug):
     """Return the details for one post. 
     """
@@ -64,7 +64,37 @@ def show_post_api(postid_url_slug):
     json_file = model.get_post(postid_url_slug, logname)
     return flask.jsonify(json_file), 200
 
+@insta485.app.route('/api/v1/likes/', methods = ['POST'])
+def post_like_api():
+    """Create like for a post and current user --> returns 201
 
+    if post is already liked by user --> return like JSON object and 200
+    """
+    logname = ""
+    if 'username' not in flask.session:
+        if not flask.request.authorization:
+            return flask.abort(403)
+        logname = flask.request.authorization['username']
+        password = flask.request.authorization['password']
+        help_auth(logname, password)
+    else:
+        logname = flask.session['username']
+    recentID = model.get_recent_postid()
+    postid = flask.request.args['postid']
+    if int(postid) > recentID:
+        return flask.abort(404)
+    likeid_and_code = model.get_like(logname, postid)
+    json_file = {
+        'likeid': likeid_and_code[0],
+        'url': f"/api/v1/likes/{likeid_and_code[0]}/"
+    }
+    return flask.jsonify(json_file), likeid_and_code[1]
+
+    
+
+@insta485.app.route('/api/v1/comments/?postid=<postid>')
+def post_comment_api(postid):
+    pass
 
 
 
