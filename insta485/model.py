@@ -124,6 +124,7 @@ def get_post(postid, logname):
         likes['lognameLikesThis'] = True
         likes['url'] = f"/api/v1/likes/{mylike['likeid']}/"
     post['likes'] = likes
+    post.pop('filename')
     return post
 
 
@@ -151,8 +152,41 @@ def get_like(logname, postid):
     likeid = likeid[0]['likeid']
     return (likeid, 200)
 
+def delete_like(logname, likeid):
+    connection = get_db()
+    cur = connection.execute(
+        "SELECT owner FROM likes "
+        "WHERE likeid = " + str(likeid) + " "
+    )
+    like = cur.fetchall()
+    if len(like) == 0:
+        return 404
+    if like[0]['owner'] != logname:
+        return 403
+    cur = connection.execute(
+        "DELETE FROM likes WHERE likeid = " + likeid + " "
+    )
+    return 204
 
 
+def post_comment(logname, postid, text):
+    connection = get_db()
+    cur = connection.execute(
+        "INSERT INTO comments(owner, postid, text) "
+        "VALUES ('" + logname + "', " + str(postid) + ", '" + text + "')"
+    )
+    cur = connection.execute("SELECT last_insert_rowid()")
+    commentid = cur.fetchall()
+    commentid = commentid[0]['last_insert_rowid()']
+    json_file = {
+        'commentid': commentid,
+        'logNameOwnsThis': True,
+        'owner': logname,
+        'ownerShowUrl': f"/users/{logname}/",
+        'text': text,
+        'url': f"/api/v1/comments/{commentid}/"
+    }
+    return json_file
 
 @insta485.app.teardown_appcontext
 def close_db(error):
@@ -167,3 +201,18 @@ def close_db(error):
         sqlite_db.commit()
         sqlite_db.close()
 
+def delete_comment(logname, commentid):
+    connection = get_db()
+    cur = connection.execute(
+        "SELECT owner FROM comments "
+        "WHERE commentid = " + str(commentid) + " "
+    )
+    comment = cur.fetchall()
+    if len(comment) == 0:
+        return 404
+    if comment[0]['owner'] != logname:
+        return 403
+    cur = connection.execute(
+        "DELETE FROM comments WHERE commentid = " + commentid + " "
+    )
+    return 204

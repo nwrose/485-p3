@@ -64,6 +64,7 @@ def show_post_api(postid_url_slug):
     json_file = model.get_post(postid_url_slug, logname)
     return flask.jsonify(json_file), 200
 
+
 @insta485.app.route('/api/v1/likes/', methods = ['POST'])
 def post_like_api():
     """Create like for a post and current user --> returns 201
@@ -90,11 +91,59 @@ def post_like_api():
     }
     return flask.jsonify(json_file), likeid_and_code[1]
 
-    
 
-@insta485.app.route('/api/v1/comments/?postid=<postid>')
-def post_comment_api(postid):
-    pass
+@insta485.app.route('/api/v1/likes/<likeid>/', methods = ['DELETE'])
+def delete_like_api(likeid):
+    logname = ""
+    if 'username' not in flask.session:
+        if not flask.request.authorization:
+            return flask.abort(403)
+        logname = flask.request.authorization['username']
+        password = flask.request.authorization['password']
+        help_auth(logname, password)
+    else:
+        logname = flask.session['username']
+    code = model.delete_like(logname, likeid)
+    if code == 404 or code == 403:
+        return flask.abort(code)
+    return flask.jsonify(), code
+
+
+@insta485.app.route('/api/v1/comments/', methods=['POST'])
+def post_comment_api():
+    logname = ""
+    if 'username' not in flask.session:
+        if not flask.request.authorization:
+            return flask.abort(403)
+        logname = flask.request.authorization['username']
+        password = flask.request.authorization['password']
+        help_auth(logname, password)
+    else:
+        logname = flask.session['username']
+    recentID = model.get_recent_postid()
+    postid = flask.request.args['postid']
+    if int(postid) > recentID:
+        return flask.abort(404)
+    text = flask.request.json.get('text', None)
+    json_file = model.post_comment(logname, postid, text)
+    return flask.jsonify(json_file), 201
+
+
+@insta485.app.route('/api/v1/comments/<commentid>/', methods = ['DELETE'])
+def delete_comment_api(commentid):
+    logname = ""
+    if 'username' not in flask.session:
+        if not flask.request.authorization:
+            return flask.abort(403)
+        logname = flask.request.authorization['username']
+        password = flask.request.authorization['password']
+        help_auth(logname, password)
+    else:
+        logname = flask.session['username']
+    code = model.delete_comment(logname, commentid)
+    if code == 404 or code == 403:
+        return flask.abort(code)
+    return flask.jsonify(), code
 
 
 
