@@ -34,14 +34,22 @@ def show_post_feed_api():
     size = flask.request.args.get("size", default=10, type=int)
     page = flask.request.args.get("page", default=0, type=int)
     postid_lte = flask.request.args.get(
-        "postid_lte", default=recentID, type=int)
-    
+        "postid_lte", default=recentID, type=int)  
+    if size < 1 or page < 0:
+        bad_file = {
+            "message": "Bad Request",
+            "status_code": 400
+        }
+        return bad_file, 400
+  
     json_file = model.get_posts(logname, size, page, postid_lte)
     json_file['next'] = ""
     if len(json_file['results']) == size:
         nextPage = page + 1
         json_file['next'] = f"/api/v1/posts/?size={size}&page={nextPage}&postid_lte={postid_lte}"
-    json_file['url'] = str(flask.request.url)
+    json_file['url'] = "/api/v1/posts/"
+    if str(flask.request.query_string.decode()):
+        json_file['url'] += "?" + str(flask.request.query_string.decode())
     return flask.jsonify(json_file), 200
 
 

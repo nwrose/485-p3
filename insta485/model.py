@@ -81,7 +81,7 @@ def get_post(postid, logname):
         "FROM posts WHERE posts.postid = " + str(postid) + " ")
     post = cur.fetchall()
     post = post[0]
-    post['imageUrl'] = f"/uploads/{post['filename']}"
+    post['imgUrl'] = f"/uploads/{post['filename']}"
     post['url'] = f"/api/v1/posts/{postid}/"
     post['postShowUrl'] = f"/posts/{postid}/"
     post['ownerShowUrl'] = f"/users/{post['owner']}/"
