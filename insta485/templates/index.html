@@ -1,13 +1,15 @@
 {% extends "all.html" %}
 {% block content %}	
 
+  <!-- Plain old HTML and jinja2 nav bar goes here -->
 
 
-<div id="reactEntry">
-	Loading ...
-</div>
-<!-- Load JavaScript -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/bundle.js') }}"></script>
+  <div id="reactEntry">
+    Loading ...
+  </div>
+  <!-- Load JavaScript -->
+  <script type="text/javascript" src="{{ url_for('static', filename='js/bundle.js') }}"></script>
+
 
 
 {% endblock content %}

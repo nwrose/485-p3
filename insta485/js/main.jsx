@@ -1,6 +1,6 @@
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import Post from "./post";
+import Feed from "./feed"
 
 // Create a root
 const root = createRoot(document.getElementById("reactEntry"));
@@ -8,7 +8,8 @@ const root = createRoot(document.getElementById("reactEntry"));
 // This method is only called once
 // Insert the post component into the DOM
 root.render(
-    <StrictMode>
-        <Post url="/api/v1/posts/1/" />
-    </StrictMode>
+  <StrictMode>
+    <Feed url="/api/v1/posts/"/>
+  </StrictMode>
 );
+

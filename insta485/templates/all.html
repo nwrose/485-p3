@@ -9,7 +9,9 @@
 		<div style="margin-right:0;margin-left:auto">
         	<a href ="{{url_for('show_explore')}}" style = "text-decoration: none;font-size:30px;">explore</a> | <a href="{{url_for('show_user',user=logname)}}" style="text-decoration: none;font-size:30px;margin-right:0;margin-left:auto;">{{logname}}</a>
 		</div>
-        {% block content %}{% endblock %}
+        {% block content %}
+		
+		{% endblock %}
 	</body>
 </html>
 
