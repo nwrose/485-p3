@@ -15,7 +15,6 @@ export default function Feed({ url }){
             })
             .then((data) => {
                 if (!ignoreStaleRequest) {
-                    //setPostArr(data.results);
                     let posts = []
                     setPostArr([...posts, ...data.results]);
                 }

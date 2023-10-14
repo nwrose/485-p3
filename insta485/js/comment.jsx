@@ -17,5 +17,4 @@ export default function Comment({ commentInfo }) {
 
 Comment.propTypes = {
   commentInfo: PropTypes.object.isRequired,
-  makeComment: PropTypes.func.isRequired,
 };

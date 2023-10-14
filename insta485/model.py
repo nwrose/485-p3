@@ -27,7 +27,6 @@ def get_db():
         # Foreign keys have to be enabled per-connection.  This is an sqlite3
         # backwards compatibility thing.
         flask.g.sqlite_db.execute("PRAGMA foreign_keys = ON")
-
     return flask.g.sqlite_db
 
 

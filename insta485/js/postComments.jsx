@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes, { array } from "prop-types";
 import Comment from "./comment"
 
-export default function postComments({ commentsInfo }){ 
+export default function postComments({ commentsInfo, makeComment, setCommentText }){ 
 
     // Render the comments individually
     
@@ -10,13 +10,21 @@ export default function postComments({ commentsInfo }){
         <div id="comments">
             {console.log('Rendering the posts comments!')}
             {commentsInfo.map((comment) => <Comment key={comment.commentid} commentInfo={comment}/> )}
-            <p id ="newComment">
-                NEW COMMENT BUTTON
-            </p>
+            
+            <form onSubmit={makeComment} data-testid="comment-form">
+                <input 
+                name="newComment"
+                type = "text"
+                placeholder = "Make New Comment"
+                onChange={(e) => setCommentText(e.target.value)}
+                />
+            </form>
         </div>
         );
 }
 postComments.propTypes = {
     commentsInfo: PropTypes.array.isRequired,
+    makeComment: PropTypes.func.isRequired,
+    setCommentText: PropTypes.func.isRequired,
   };
 

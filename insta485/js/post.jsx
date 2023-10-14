@@ -14,10 +14,31 @@ export default function Post({ url }) {
   const [ownerImgUrl, setOwnerImgUrl] = useState("");
   const [timestamp, setTimestamp] = useState("");
   const [postid, setPostid] = useState(-1);
-  const [commentsInfo, setCommentInfo] = useState([])
-  const [numLikes, setNumLikes] = useState(-1)
-  const [likeStatus, setLikeStatus] = useState(true)
-  const [rmLikeUrl, setrmLikeUrl] = useState("")
+  const [commentsInfo, setCommentInfo] = useState([]);
+  const [numLikes, setNumLikes] = useState(-1);
+  const [likeStatus, setLikeStatus] = useState(true);
+  const [rmLikeUrl, setrmLikeUrl] = useState("");
+  const [commentText, setCommentText] = useState("");
+  const [trigger, setTrigger] = useState(false);
+
+  //do the make comment stuff
+  function makeComment(e){
+    console.log(`making comment:  ${commentText}`);
+    e.preventDefault();
+    fetch(`/api/v1/comments/?postid=${postid}`, {
+        credentials: "same-origin", 
+        method: "POST",
+        headers: {'Content-Type': 'application/json'}, 
+        body: JSON.stringify({text: commentText})
+    })
+    .then((response) => {
+        if(!response.ok) throw Error(response.statusText);
+        return response.json();
+    })
+    .catch((error) => console.log(error));
+    let val = !trigger;
+    setTrigger(val);
+  }
 
   //Do the like button function stuff
 
@@ -39,7 +60,7 @@ export default function Post({ url }) {
         .catch((error) => console.log(error));
         return () => {
             double_ignoreStaleRequest = true;
-        }    }
+        }}
   }
 
   function toggleLike() {
@@ -104,7 +125,7 @@ export default function Post({ url }) {
           setCommentInfo(data.comments);
           setNumLikes(data.likes.numLikes);
           setLikeStatus(data.likes.lognameLikesThis);
-          setrmLikeUrl(data.likes.url)
+          setrmLikeUrl(data.likes.url);
         }
       })
       .catch((error) => console.log(error));
@@ -115,7 +136,7 @@ export default function Post({ url }) {
       // should avoid updating state.
       ignoreStaleRequest = true;
     };
-  }, [url]);
+  }, [url, trigger]);
 
   // Render post image and post owner
   return (
@@ -124,7 +145,7 @@ export default function Post({ url }) {
         <InfoBar owner={owner} timestamp={timestamp} ownerImgUrl={ownerImgUrl} postid={postid}/>
         <img src={imgUrl} alt="post_image" onDoubleClick={() => doubleClick()}/>
         <Likes numLikes={numLikes} toggleLike={toggleLike} likeStatus={likeStatus}/>
-        <PostComments commentsInfo={commentsInfo}/>
+        <PostComments commentsInfo={commentsInfo} makeComment={makeComment} setCommentText = {setCommentText}/>
     </div>
   );
 }
