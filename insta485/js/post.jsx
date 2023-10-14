@@ -15,19 +15,76 @@ export default function Post({ url }) {
   const [timestamp, setTimestamp] = useState("");
   const [postid, setPostid] = useState(-1);
   const [commentsInfo, setCommentInfo] = useState([])
-  const [likesInfo, setLikesInfo] = useState({})
-  const [likeStatus, setLikeStatus] = useState(false)
+  const [numLikes, setNumLikes] = useState(-1)
+  const [likeStatus, setLikeStatus] = useState(true)
+  const [rmLikeUrl, setrmLikeUrl] = useState("")
+
+  //Do the like button function stuff
+
+  function doubleClick(){
+    let double_ignoreStaleRequest = false;
+    if(!likeStatus){
+        fetch(`/api/v1/likes/?postid=${postid}`, {credentials: "same-origin", method: "POST"})
+        .then((response) => {
+            if(!response.ok) throw Error(response.statusText);
+            return response.json()
+        })
+        .then((data) => {
+            if (!double_ignoreStaleRequest){
+                setNumLikes(numLikes + 1);
+                setrmLikeUrl(data.url);
+                setLikeStatus(true);
+            }
+        })
+        .catch((error) => console.log(error));
+        return () => {
+            double_ignoreStaleRequest = true;
+        }    }
+  }
+
+  function toggleLike() {
+    let like_ignoreStaleRequest = false;
+    if (likeStatus){
+        fetch(rmLikeUrl, { credentials: "same-origin", method:'DELETE'})
+        .then((response) => {
+            if(!response.ok) throw Error(response.statusText);
+        })
+        .then(() => {
+            if(!like_ignoreStaleRequest){
+                setNumLikes(numLikes - 1);
+                setrmLikeUrl("");
+                setLikeStatus(false);
+            }
+        })  
+        .catch((error) => console.log(error));
+        return () => {
+            like_ignoreStaleRequest = true;
+        }
+    }
+    else{
+        fetch(`/api/v1/likes/?postid=${postid}`, {credentials: "same-origin", method: "POST"})
+        .then((response) => {
+            if(!response.ok) throw Error(response.statusText);
+            return response.json()
+        })
+        .then((data) => {
+            if (!like_ignoreStaleRequest){
+                setNumLikes(numLikes + 1);
+                setrmLikeUrl(data.url);
+                setLikeStatus(true);
+            }
+        })
+        .catch((error) => console.log(error));
+        return () => {
+            like_ignoreStaleRequest = true;
+        }
+    }
+  }
+
 
   useEffect(() => {
     // Declare a boolean flag that we can use to cancel the API request.
     let ignoreStaleRequest = false;
-
-    //Do the like button function stuff
-
-    
-    function toggleLike(){
-        setLikeStatus(!likeStatus)
-    }
 
     // Call REST API to get the post's information
     fetch(url, { credentials: "same-origin" })
@@ -44,9 +101,10 @@ export default function Post({ url }) {
           setTimestamp(data.created);
           setOwnerImgUrl(data.ownerImgUrl);
           setPostid(data.postid);
-          setCommentInfo(data.comments)
-          setLikesInfo(data.likes)
-          setLikeStatus(data.likes.lognameLikesThis)
+          setCommentInfo(data.comments);
+          setNumLikes(data.likes.numLikes);
+          setLikeStatus(data.likes.lognameLikesThis);
+          setrmLikeUrl(data.likes.url)
         }
       })
       .catch((error) => console.log(error));
@@ -64,8 +122,8 @@ export default function Post({ url }) {
     <div className="post">
         {console.log('rendering a post!')}
         <InfoBar owner={owner} timestamp={timestamp} ownerImgUrl={ownerImgUrl} postid={postid}/>
-        <img src={imgUrl} alt="post_image" />
-        <Likes likesInfo={likesInfo} toggleLike={toggleLike}/>
+        <img src={imgUrl} alt="post_image" onDoubleClick={() => doubleClick()}/>
+        <Likes numLikes={numLikes} toggleLike={toggleLike} likeStatus={likeStatus}/>
         <PostComments commentsInfo={commentsInfo}/>
     </div>
   );

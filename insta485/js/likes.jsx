@@ -2,20 +2,21 @@ import React, { useState, useEffect } from "react";
 import PropTypes, { object } from "prop-types";
 
 
-export default function Likes({ likesInfo, toggleLike }){ 
+export default function Likes({ numLikes, toggleLike, likeStatus }){
     
-    let singular = likesInfo.numLikes === 1
+    let singular = numLikes === 1
     return (
         <div id="likes">
             <div id = "button">
-                <button onClick={toggleLike}>{likeStatus ? 'unlike' : 'like'}</button>
+                <button data-testid="like-unlike-button" onClick={toggleLike}>{likeStatus ? 'unlike' : 'like'}</button>
             </div>
-            {likesInfo['numLikes']} <span>{singular ? 'like' : 'likes'}</span>
+            {numLikes} <span>{singular ? 'like' : 'likes'}</span>
         </div>
         );
 }
 Likes.propTypes = {
-    likesInfo: PropTypes.object.isRequired,
+    numLikes: PropTypes.number.isRequired,
     toggleLike: PropTypes.func.isRequired,
+    likeStatus: PropTypes.bool.isRequired,
   };
 
