@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";git 
-import Likes from "./likes"
-import InfiniteScroll from 'react-infinite-scroll-component';
+import PropTypes from "prop-types";
+import Likes from "./likes";
 
 // The parameter of this function is an object with a string called url inside it.
 // url is a prop for the Post component.
