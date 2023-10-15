@@ -5,28 +5,20 @@ import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function Feed({ url }){
     const [postArr, setPostArr] = useState([]);
-    const [pageNext, setPageNext] = useState("");
+    const [pageNext, setPageNext] = useState(url);
+    const [hasMore, setHasMore] = useState(true);
+    const [trigger, setTrigger] = useState(true);
+
+    function getNextPage(){
+        console.log(`getting next page at: ${pageNext}`)
+        setTrigger(!trigger);
+    }
+
     useEffect(() => {
         let ignoreStaleRequest = false;
-
-        function functFetch(){
-            fetch(url, { credentials: "same-origin" })
-            .then((response) => {
-                if (!response.ok) throw Error(response.statusText);
-                return response.json();
-            })
-            .then((data) => {
-                if (!ignoreStaleRequest) {
-                    let posts = postArr;
-                    setPostArr([...posts, ...data.results]);
-                    setPageNext(data.next);
-                }
-            })
-            .catch((error) => console.log(error));
-        }
         
         //Call Rest API to get the list of posts on feed
-        fetch(url, { credentials: "same-origin" })
+        fetch(pageNext, { credentials: "same-origin" })
             .then((response) => {
                 if (!response.ok) throw Error(response.statusText);
                 return response.json();
@@ -36,6 +28,7 @@ export default function Feed({ url }){
                     let posts = postArr;
                     setPostArr([...posts, ...data.results]);
                     setPageNext(data.next);
+                    setHasMore(data.next !== "");
                 }
             })
             .catch((error) => console.log(error));
@@ -45,28 +38,33 @@ export default function Feed({ url }){
             //    for more info about ignoreStaleRequest
             ignoreStaleRequest = true;
         }
-    }, [url]);
+    }, [url, trigger]);
 
-    //define postFunc
-    function postFunc(post){
-        return <Post key={post.postid} url={`/api/v1/posts/${post.postid}/`}/>
-    }
-
-    // Render the feed
+    // Render the f
     return (
         <div id="feed">
             <InfiniteScroll
-            dataLength={postArr.length}
-            next={bottomLoad}
-
+            dataLength={postArr.length} //This is important field to render the next data
+            next={getNextPage}
+            hasMore={hasMore}
+            loader={<h4>Loading...</h4>}
+            endMessage={
+            <p style={{ textAlign: 'center' }}>
+                <b>All Posts Loaded</b>
+            </p>
+            }
             >
-                {console.log('rendering the feed!')}
-                {postArr.map((post) => postFunc(post) )}
+                {postArr.map((post) => (<Post key={post.postid} url={`/api/v1/posts/${post.postid}/`}/>) )}
             </InfiniteScroll>
         </div>
+
+
+
+
         );
 }
-
+//            {console.log('rendering the feed!')}
+  //          
 Feed.propTypes = {
     url: PropTypes.string.isRequired,
   };

@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
 import Likes from "./likes";
+
 
 // The parameter of this function is an object with a string called url inside it.
 // url is a prop for the Post component.
 export default function Post({ url }) {
   /* Display image and post owner of a single post */
+  dayjs.extend(relativeTime);
+  dayjs.extend(utc);
 
   const [imgUrl, setImgUrl] = useState("");
   const [owner, setOwner] = useState("");
@@ -158,7 +164,7 @@ export default function Post({ url }) {
         if (!ignoreStaleRequest) {
           setImgUrl(data.imgUrl);
           setOwner(data.owner);
-          setTimestamp(data.created);
+          setTimestamp(dayjs(data.created).local().fromNow());
           setOwnerImgUrl(data.ownerImgUrl);
           setPostid(data.postid);
           setCommentInfo(data.comments);
