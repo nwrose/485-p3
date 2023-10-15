@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import InfoBar from "./infoBar"
-import PostComments from "./postComments"
+import PropTypes from "prop-types";git 
 import Likes from "./likes"
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 // The parameter of this function is an object with a string called url inside it.
 // url is a prop for the Post component.
@@ -20,9 +19,35 @@ export default function Post({ url }) {
   const [rmLikeUrl, setrmLikeUrl] = useState("");
   const [commentText, setCommentText] = useState("");
   const [trigger, setTrigger] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+
+  //do the delete comment stuff
+  function deleteComment(del_url){
+    setLoadingData(true);
+    console.log(`Deleting comment using api at: ${del_url}`);
+    let delComment_ignoreStaleRequest = false;
+    fetch(del_url, { credentials: "same-origin", method:'DELETE'})
+        .then((response) => {
+            if(!response.ok){
+              throw Error(response.statusText);
+            }
+        })
+        .then(() => {
+            if(!delComment_ignoreStaleRequest){
+              let val = !trigger;
+              setTrigger(val);
+            }
+        })  
+        .catch((error) => console.log(error));
+        return () => {
+            delComment_ignoreStaleRequest = true;
+        }
+  }
+
 
   //do the make comment stuff
   function makeComment(e){
+    setLoadingData(true);
     console.log(`making comment:  ${commentText}`);
     e.preventDefault();
     fetch(`/api/v1/comments/?postid=${postid}`, {
@@ -33,18 +58,21 @@ export default function Post({ url }) {
     })
     .then((response) => {
         if(!response.ok) throw Error(response.statusText);
+        setCommentText("")
+        let val = !trigger;
+        setTrigger(val);
         return response.json();
     })
     .catch((error) => console.log(error));
-    let val = !trigger;
-    setTrigger(val);
   }
 
   //Do the like button function stuff
 
   function doubleClick(){
+    
     let double_ignoreStaleRequest = false;
     if(!likeStatus){
+        setLoadingData(true);
         fetch(`/api/v1/likes/?postid=${postid}`, {credentials: "same-origin", method: "POST"})
         .then((response) => {
             if(!response.ok) throw Error(response.statusText);
@@ -52,10 +80,14 @@ export default function Post({ url }) {
         })
         .then((data) => {
             if (!double_ignoreStaleRequest){
-                setNumLikes(numLikes + 1);
-                setrmLikeUrl(data.url);
+                let temp = numLikes + 1;
+                setNumLikes(temp);
+                let temp2 = data.url
+                setrmLikeUrl(temp2);
                 setLikeStatus(true);
             }
+            let val = !trigger;
+            setTrigger(val);
         })
         .catch((error) => console.log(error));
         return () => {
@@ -64,6 +96,7 @@ export default function Post({ url }) {
   }
 
   function toggleLike() {
+    setLoadingData(true);
     let like_ignoreStaleRequest = false;
     if (likeStatus){
         fetch(rmLikeUrl, { credentials: "same-origin", method:'DELETE'})
@@ -72,10 +105,13 @@ export default function Post({ url }) {
         })
         .then(() => {
             if(!like_ignoreStaleRequest){
-                setNumLikes(numLikes - 1);
+                let temp = numLikes - 1;
+                setNumLikes(temp);
                 setrmLikeUrl("");
                 setLikeStatus(false);
             }
+            let val = !trigger;
+            setTrigger(val);
         })  
         .catch((error) => console.log(error));
         return () => {
@@ -90,10 +126,14 @@ export default function Post({ url }) {
         })
         .then((data) => {
             if (!like_ignoreStaleRequest){
-                setNumLikes(numLikes + 1);
-                setrmLikeUrl(data.url);
+                let temp = numLikes + 1;
+                setNumLikes(temp);
+                let temp2 = data.url;
+                setrmLikeUrl(temp2);
                 setLikeStatus(true);
             }
+            let val = !trigger;
+            setTrigger(val);
         })
         .catch((error) => console.log(error));
         return () => {
@@ -126,7 +166,9 @@ export default function Post({ url }) {
           setNumLikes(data.likes.numLikes);
           setLikeStatus(data.likes.lognameLikesThis);
           setrmLikeUrl(data.likes.url);
+          setLoadingData(false);
         }
+        
       })
       .catch((error) => console.log(error));
 
@@ -136,16 +178,53 @@ export default function Post({ url }) {
       // should avoid updating state.
       ignoreStaleRequest = true;
     };
-  }, [url, trigger]);
+  }, [trigger]);
 
   // Render post image and post owner
   return (
     <div className="post">
-        {console.log('rendering a post!')}
-        <InfoBar owner={owner} timestamp={timestamp} ownerImgUrl={ownerImgUrl} postid={postid}/>
-        <img src={imgUrl} alt="post_image" onDoubleClick={() => doubleClick()}/>
-        <Likes numLikes={numLikes} toggleLike={toggleLike} likeStatus={likeStatus}/>
-        <PostComments commentsInfo={commentsInfo} makeComment={makeComment} setCommentText = {setCommentText}/>
+      {loadingData ? <span>Loading Data...</span>: 
+      <div>
+      {console.log(`rendering post with postid: ${postid}`)}
+      <div className="infoBar"> 
+        <a href={`/users/${owner}/`}>
+            <img src={ownerImgUrl} alt={`${owner}'s pfp`} className="pfp"/>
+            &nbsp;{owner}
+        </a>
+        <span>&nbsp;&nbsp;&nbsp;</span>
+        <a href={`/posts/${postid}/`}>{timestamp}</a>
+      </div>
+
+      <img src={imgUrl} alt="post_image" onDoubleClick={doubleClick}/>
+      <Likes numLikes={numLikes} toggleLike={toggleLike} likeStatus={likeStatus}/>
+      <div id="comments">
+          {commentsInfo.map((comment) => (
+            <p className="comment" key={comment.commentid}>
+              <a href={comment.ownerShowUrl}>{comment.owner}</a>
+              <span data-testid="comment-text">{comment.text}</span>
+              {comment.lognameOwnsThis ? 
+                <button
+                  id={comment.commentid}
+                  data-testid="delete-comment-button" 
+                  onClick={(e) => deleteComment(comment.url)}>
+                    Delete comment
+                </button> : <span></span>
+              }
+            </p>
+          ) )}
+          <form onSubmit={makeComment} data-testid="comment-form">
+              <input 
+              name="newComment"
+              type = "text"
+              placeholder = "Make New Comment"
+              value = {commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              />
+          </form>
+      </div>
+      
+      </div>
+      }
     </div>
   );
 }

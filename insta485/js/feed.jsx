@@ -28,11 +28,16 @@ export default function Feed({ url }){
         }
     }, [url]);
 
+    //define postFunc
+    function postFunc(post){
+        return <Post key={post.postid} url={`/api/v1/posts/${post.postid}/`}/>
+    }
+
     // Render the feed
     return (
         <div id="feed">
             {console.log('rendering the feed!')}
-            {postArr.map((post) => <Post key={post.postid} url={`/api/v1/posts/${post.postid}/`}/> )}
+            {postArr.map((post) => postFunc(post) )}
         </div>
         );
 }

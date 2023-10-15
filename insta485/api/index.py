@@ -150,6 +150,7 @@ def delete_comment_api(commentid):
         logname = flask.session['username']
     code = model.delete_comment(logname, commentid)
     if code == 404 or code == 403:
+        print("my error code is: ", code)
         return flask.abort(code)
     return flask.jsonify(), code
 
