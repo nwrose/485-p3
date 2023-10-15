@@ -31,24 +31,22 @@ def get_db():
 
 
 def get_recent_postid():
-    """Returns the id of the most recent post.
-    
+    """Return the id of the most recent post.
+
     Return as an Integer
     """
     connection = get_db()
     cur = connection.execute(
         "SELECT MAX(postid) FROM posts"
     )
-    id = cur.fetchall()
-    return id[0]['MAX(postid)']
+    id_recent = cur.fetchall()
+    return id_recent[0]['MAX(postid)']
 
 
 def get_posts(username, size, page, postid_lte):
-    """Return the requested posts id and url 
-    specified by username, size, page, postid_lte
-    
-    Return as a JSON dictionary
-    with status code 200 OK
+    """Return dictionary of posts and their URLs.
+
+    Return as a JSON dictionary with status code 200 OK
     """
     offset = size * page
     connection = get_db()
@@ -59,12 +57,13 @@ def get_posts(username, size, page, postid_lte):
         "SELECT following.username2 FROM following "
         "WHERE following.username1 = '" + username + "' )) "
         "AND posts.postid <= " + str(postid_lte) + " "
-        "ORDER BY posts.postid DESC " 
+        "ORDER BY posts.postid DESC "
         "LIMIT " + str(size) + " OFFSET " + str(offset) + " "
         )
     queried_posts = cur.fetchall()
     for queried_post in queried_posts:
-        queried_post['url'] = "/api/v1/posts/" + str(queried_post['postid']) + "/"
+        queried_post['url'] = "/api/v1/posts/" + \
+            str(queried_post['postid']) + "/"
     json_dict = {
         'next': "",
         'results': queried_posts,
@@ -72,7 +71,9 @@ def get_posts(username, size, page, postid_lte):
     }
     return json_dict
 
+
 def get_post(postid, logname):
+    """Get post information for post <postid>."""
     connection = get_db()
     cur = connection.execute(
         "SELECT posts.postid, posts.filename, posts.owner, "
@@ -98,7 +99,7 @@ def get_post(postid, logname):
         "ORDER BY comments.commentid ASC")
     comments = cur.fetchall()
     for comment in comments:
-        comment['lognameOwnsThis'] = (comment['owner'] == logname)
+        comment['lognameOwnsThis'] = comment['owner'] == logname
         comment['ownerShowUrl'] = f"/users/{comment['owner']}/"
         comment['url'] = f"/api/v1/comments/{comment['commentid']}/"
     post['comments'] = comments
@@ -128,6 +129,7 @@ def get_post(postid, logname):
 
 
 def get_like(logname, postid):
+    """Get the like information for post <postid>."""
     connection = get_db()
     cur = connection.execute(
         "SELECT likeid FROM likes "
@@ -141,9 +143,9 @@ def get_like(logname, postid):
             "VALUES ('" + logname + "', " + str(postid) + ")"
         )
         cur = connection.execute(
-        "SELECT likeid FROM likes "
-        "WHERE likes.owner = '" + logname + "' "
-        "AND likes.postid = " + str(postid) + ""
+            "SELECT likeid FROM likes "
+            "WHERE likes.owner = '" + logname + "' "
+            "AND likes.postid = " + str(postid) + ""
         )
         likeid = cur.fetchall()
         likeid = likeid[0]['likeid']
@@ -151,7 +153,9 @@ def get_like(logname, postid):
     likeid = likeid[0]['likeid']
     return (likeid, 200)
 
+
 def delete_like(logname, likeid):
+    """Delete like <likeid>."""
     connection = get_db()
     cur = connection.execute(
         "SELECT owner FROM likes "
@@ -169,6 +173,7 @@ def delete_like(logname, likeid):
 
 
 def post_comment(logname, postid, text):
+    """Post comment  <text> on post <postid>."""
     connection = get_db()
     cur = connection.execute(
         "INSERT INTO comments(owner, postid, text) "
@@ -187,6 +192,7 @@ def post_comment(logname, postid, text):
     }
     return json_file
 
+
 @insta485.app.teardown_appcontext
 def close_db(error):
     """Close the database at the end of a request.
@@ -200,7 +206,9 @@ def close_db(error):
         sqlite_db.commit()
         sqlite_db.close()
 
+
 def delete_comment(logname, commentid):
+    """Delete comment <commentid>."""
     connection = get_db()
     cur = connection.execute(
         "SELECT owner FROM comments "
